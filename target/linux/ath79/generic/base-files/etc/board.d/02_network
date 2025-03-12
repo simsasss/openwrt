@@ -236,6 +236,11 @@ ath79_setup_interfaces()
 		ucidef_add_switch "switch0" \
 			"0@eth0" "1:lan:1" "2:lan:4" "3:lan:3" "4:lan:2"
 		;;
+	teltonika,rut230-v1)
+		ucidef_set_interfaces_lan_wan "eth0" "eth1"
+		ucidef_set_interface "mobile" device "/dev/cdc-wdm0" protocol "qmi"
+		uci add_list firewall.@zone[1].network='mobile'
+		;;
 	buffalo,wzr-hp-g300nh-rb|\
 	buffalo,wzr-hp-g300nh-s|\
 	dlink,dir-825-b1|\
