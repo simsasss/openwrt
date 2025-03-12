@@ -378,6 +378,7 @@ samsung,wam250)
 teltonika,rut230-v1)
 	ucidef_set_led_netdev "wan" "WAN" "green:wan" "eth1"
 	ucidef_set_led_switch "lan" "LAN" "green:lan" "switch0" "0x04"
+	ucidef_set_led_netdev "mobile" "LTE" "green:4g" "wwan0"
 	;;
 teltonika,rut300)
 	ucidef_set_led_netdev "wan" "WAN" "yellow:wan" "eth1"
