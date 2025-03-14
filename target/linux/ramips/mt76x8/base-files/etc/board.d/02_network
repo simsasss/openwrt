@@ -167,6 +167,18 @@ ramips_setup_interfaces()
 		ucidef_add_switch "switch0" \
 			"0:wan" "1:lan" "2:lan" "3:lan" "4:lan" "6t@eth0"
 		;;
+	teltonika,rut241)
+		ucidef_add_switch "switch0" \
+			"1:lan" "0:wan" "6@eth0"
+		ucidef_set_interface "mobile" device "/dev/cdc-wdm0" protocol "qmi"
+		uci add_list firewall.@zone[1].network='mobile'
+		;;
+	teltonika,rut200)
+		ucidef_add_switch "switch0" \
+			"1:lan" "0:wan" "6@eth0"
+		ucidef_set_interface "mobile" device "usb0" protocol "dhcp"
+		uci add_list firewall.@zone[1].network='mobile'
+	;;
 	tplink,archer-mr200-v5|\
 	tplink,archer-mr200-v6)
 		ucidef_add_switch "switch0" \
