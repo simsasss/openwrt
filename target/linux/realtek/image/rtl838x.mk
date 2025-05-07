@@ -460,3 +460,11 @@ define Device/zyxel_gs1900-24hp-b1
   DEVICE_PACKAGES += realtek-poe
 endef
 TARGET_DEVICES += zyxel_gs1900-24hp-b1
+
+define Device/teltonika_tsw202
+  DEVICE_VENDOR := Teltonika
+  DEVICE_MODEL := TSW202
+  SOC := rtl8380
+  IMAGE_SIZE := 15168k
+endef
+TARGET_DEVICES += teltonika_tsw202

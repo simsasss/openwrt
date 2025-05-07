@@ -47,6 +47,10 @@ hpe,1920-48g-poe)
 	lan_mac_start=$(macaddr_add $lan_mac 2)
 	lan_mac_end=$(macaddr_add $lan_mac $((mac_count2-mac_count1)))
 	;;
+teltonika,tsw202)
+	label_mac=$(mtd_get_mac_binary config 0x0)
+	lan_mac="$label_mac"
+	;;
 plasmacloud,psx8|\
 plasmacloud,psx10|\
 tplink,sg2008p-v1|\
