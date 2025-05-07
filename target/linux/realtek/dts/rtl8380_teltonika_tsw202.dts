@@ -1,0 +1,141 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#include "rtl8380_teltonika_tsw.dtsi"
+
+/ {
+	compatible = "teltonika,tsw202", "realtek,rtl838x-soc";
+	model = "Teltonika TSW202";
+
+	/* i2c of the left SFP cage: port 9 */
+	i2c0: i2c-gpio-0 {
+		compatible = "i2c-gpio";
+		sda-gpios = <&gpio0 3 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&gpio0 2 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		i2c-gpio,delay-us = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+
+	sfp0: sfp-p9 {
+		compatible = "sff,sfp";
+		i2c-bus = <&i2c0>;
+		mod-def0-gpio = <&gpio0 13 GPIO_ACTIVE_LOW>;
+		tx-disable-gpio =  <&gpio0 10 GPIO_ACTIVE_HIGH>;
+	};
+
+	/* i2c of the right SFP cage: port 10 */
+	i2c1: i2c-gpio-1 {
+		compatible = "i2c-gpio";
+		sda-gpios = <&gpio0 14 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&gpio0 12 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		i2c-gpio,delay-us = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+
+	sfp1: sfp-p10 {
+		compatible = "sff,sfp";
+		i2c-bus = <&i2c1>;
+		mod-def0-gpio = <&gpio0 11 GPIO_ACTIVE_LOW>;
+		tx-disable-gpio = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+	};
+
+	/* i2c of the POE chip */
+	i2c2: i2c-gpio-2 {
+		compatible = "i2c-gpio";
+		sda-gpios = <&gpio0 5 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		scl-gpios = <&gpio0 4 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+		i2c-gpio,delay-us = <2>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+	};
+
+	poe1: poe@119 {
+		compatible = "ip808";
+		reg = <119>;
+		i2c-bus = <&i2c2>;
+	};
+
+	leds: leds {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinmux_disable_sys_led>;
+		compatible = "gpio-leds";
+
+		led_power: led-0 {
+			function = LED_FUNCTION_POWER;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio1 55 GPIO_ACTIVE_HIGH>;
+		};
+
+		yellow_eth_port_1 {
+			label = "yellow:eth_port_1";
+			gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+
+		yellow_eth_port_2 {
+			label = "yellow:eth_port_2";
+			gpios = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+		yellow_eth_port_3 {
+			label = "yellow:eth_port_3";
+			gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+		yellow_eth_port_4 {
+			label = "yellow:eth_port_4";
+			gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+		yellow_eth_port_5 {
+			label = "yellow:eth_port_5";
+			gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+		yellow_eth_port_6 {
+			label = "yellow:eth_port_6";
+			gpios = <&gpio1 13 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+		yellow_eth_port_7 {
+			label = "yellow:eth_port_7";
+			gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+		yellow_eth_port_8 {
+			label = "yellow:eth_port_8";
+			gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "timer";
+		};
+	};
+
+	keys {
+		compatible = "gpio-keys-polled";
+		poll-interval = <20>;
+
+		reset {
+			label = "reset";
+			gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+		};
+	};
+};
+
+&mdio_gpio {
+	status = "okay";
+
+	gpio1: expander@31 {
+		compatible = "realtek,rtl8231";
+		reg = <31>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-ranges = <&gpio1 0 0 37>;
+
+		led-controller {
+			compatible = "realtek,rtl8231-leds";
+			status = "disabled";
+		};
+	};
+};
