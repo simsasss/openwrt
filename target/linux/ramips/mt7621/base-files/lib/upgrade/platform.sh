@@ -217,6 +217,13 @@ platform_do_upgrade() {
 		zyxel_mstc_upgrade_prepare
 		nand_do_upgrade "$1"
 		;;
+	teltonika,rutm11|\
+	teltonika,rutm50|\
+	teltonika,rutm51)
+		CI_UBIPART="rutos-a"
+		[ grep -q ubi.mtd=rutos-b /proc/cmdline ] && CI_UBIPART="rutos-b"
+		nand_do_upgrade "$1"
+		;;
 	*)
 		default_do_upgrade "$1"
 		;;

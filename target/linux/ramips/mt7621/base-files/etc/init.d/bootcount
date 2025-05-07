@@ -49,5 +49,51 @@ boot() {
 		[ $(printf %d $(fw_printenv -n Image1Stable)) -gt 0 ] || fw_setenv Image1Stable 1
 		[ $(printf %d $(fw_printenv -n Image1Try)) -gt 0 ] && fw_setenv Image1Try 0
 		;;
+	teltonika,rutm51|\
+	teltonika,rutm11)
+		#this will disable failsafe boot, to recover to factory value execute and flash fw over bootloader
+		# fw_setenv bootcmd "bootfailsafe || reset"
+		#fw_setenv bootcmd "bootnand 0"
+		#find_mtd_part bootconfig-a
+		local PREFIX=/dev/mtd
+		
+		local INDEX="$(find_mtd_index bootconfig-a)"
+		local bootconfig_a="$PREFIX$INDEX"
+		
+		INDEX="$(find_mtd_index bootconfig-b)"
+		local bootconfig_b="$PREFIX$INDEX"
+		local active_part
+		local seek=0
+		
+		logger "bootconfig-a: $bootconfig_a"
+		logger "bootconfig-b: $bootconfig_b"
+		
+		if grep -q ubi.mtd=rutos-a /proc/cmdline; then
+			active_part="$bootconfig_a"
+		else
+			active_part="$bootconfig_b"
+		fi
+
+		while [ $(hexdump -n 16 -s "$seek" -e '16/1 "%02x"' "$active_part") != "ffffffffffffffffffffffffffffffff" ]; do
+			seek=$(( seek + 16 ))
+		done
+
+		seek=$(( seek - 16 ))
+
+		if grep -q ubi.mtd=rutos-a /proc/cmdline; then
+			[ "$(hexdump -n 16 -s "$seek" -e '16/1 "%02x"' "$bootconfig_a")" != "e1b0baba0100f901f801f0003dd4fb95" ] && {
+				echo "Updating boot-a config"
+				mtd erase "$bootconfig_a"
+				echo -ne "\xe1\xb0\xba\xba\x01\x00\xf9\x01\xf8\x01\xf0\x00\x3d\xd4\xfb\x95" | mtd write - "$bootconfig_a"
+			}
+		else
+			[ "$(hexdump -n 16 -s "$seek" -e '16/1 "%02x"' "$bootconfig_b")" != "e1b0baba0101f800f901f000f9420c7d" ] && {
+				#~ mtd erase "bootconfig-b"
+				echo "Updating boot-b config"
+				mtd erase "$bootconfig_b"
+				echo -ne "\xe1\xb0\xba\xba\x01\x01\xf8\x00\xf9\x01\xf0\x00\xf9\x42\x0c\x7d" | mtd write - "$bootconfig_b"
+			}
+		fi
+		;;
 	esac
 }

@@ -160,6 +160,18 @@ ramips_setup_interfaces()
 	tplink,tl-wpa8631p-v3)
 		ucidef_set_interface_lan "lan1 lan2 lan3 plc0"
 		;;
+	teltonika,rutm11|\
+	teltonika,rutm50)
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3" "wan"
+		ucidef_set_interface "mobile" device "/dev/cdc-wdm0" protocol "qmi"
+		uci add_list firewall.@zone[1].network='mobile'
+		;;
+	teltonika,rutm51)
+		ucidef_set_interfaces_lan_wan "lan1 lan2 lan3 lan4" "wan"
+		ucidef_set_interface "mobile" device "eth1" protocol "dhcp"
+		uci add_list firewall.@zone[1].network='mobile'
+		uci add_list firewall.@zone[1].network='mobile6'
+		;;
 	ubnt,edgerouter-x)
 		ucidef_set_interfaces_lan_wan "eth1 eth2 eth3 eth4" "eth0"
 		;;

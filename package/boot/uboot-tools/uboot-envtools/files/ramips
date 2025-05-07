@@ -160,6 +160,10 @@ netgear,wax214v2)
 	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x20000" "0x20000"
 	ubootenv_add_uci_sys_config "/dev/mtd1" "0x20000" "0x8000" "0x20000"
 	;;
+teltonika,rutm11)
+	local envdev=/dev/mtd$(find_mtd_index "u-boot-env")
+	ubootenv_add_uci_config "$envdev" "0x0" "0x10000" "0x10000"
+	;;
 esac
 
 config_load ubootenv

@@ -1,0 +1,144 @@
+#include "mt7621.dtsi"
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
+
+/ {
+	chosen {
+				//neveikia konsole su ramdisk nesibootina is nand ubi fail
+				bootargs = "console=ttyS0,115200";
+				
+				//overridino ramdiske, konsole ok. ubi fail
+				//bootargs-override = "console=ttyS0,115200";
+				
+				//ubi mtd fail
+				//bootargs-append = "console=ttyS0,115200 ubi.mtd=rutos-a ubi.block=0,1 root=/dev/ubiblock0_1";
+				
+				//neveikia
+				//bootargs-append = "console=ttyS0,115200";
+				
+				
+                //bootargs = "ubi.mtd=rutos-a ubi.block=0,1 root=/dev/ubiblock0_1 rootfstype=squashfs console=ttyS0,115200n8";
+                //bootargs-override = "ubi.mtd=rutos-a ubi.block=0,1 root=/dev/ubiblock0_0 rootfstype=squashfs console=ttyS0,115200n8";
+                //bootargs-override = "console=ttyS0,115200";
+                //veikia [    0.000000] Kernel command line:  ubi.mtd=rutos-a ubi.block=0,1 root=/dev/ubiblock0_1 rootfstype=squashfs console=ttyS0,115200n8 rootfstype=squashfs,jffs2
+
+        };
+};
+
+&pcie {
+    status = "okay";
+};
+
+&pcie0 {
+    wifi@0,0 {
+        compatible = "mediatek,mt76";
+        reg = <0x0000 0 0 0 0>;
+        mediatek,mtd-eeprom = <&factory 0x0>;
+    };
+};
+
+&gmac0 {
+	mtd-mac-address = <&config 0x0>;
+};
+
+&gmac1 {
+        status = "okay";
+	label = "wan";
+	phy-handle = <&ephy4>;
+	mtd-mac-address = <&config 0x0>;
+	mtd-mac-address-increment = <1>;
+};
+
+&mdio {
+	ephy4: ephy@4 {
+		reg = <4>;
+	};
+
+	ephy7: ephy@7 {
+		reg = <7>;
+	};
+};
+
+&spi0 {
+    cs-gpios = <&gpio 34 GPIO_ACTIVE_HIGH>, <&gpio 35 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+
+	flash_nor@0 {
+		compatible = "jedec,spi-nor", "n25q128a11";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			boot: partition@0 {
+				label = "u-boot";
+				reg = <0x0 0x80000>;
+				read-only;
+			};
+
+			partition@80000 {
+				label = "u-boot-env";
+				reg = <0x80000 0x10000>;
+			};
+
+			config: partition@90000 {
+				label = "config";
+				reg = <0x90000 0x10000>;
+				read-only;
+			};
+
+			partition@a0000 {
+				label = "bootconfig-a";
+				reg = <0xa0000 0x10000>;
+			};
+
+			partition@b0000 {
+				label = "bootconfig-b";
+				reg = <0xb0000 0x10000>;
+			};
+
+			factory: partition@c0000 {
+				label = "factory";
+				reg = <0xc0000 0x10000>;
+				read-only;
+			};
+
+			partition@d0000 {
+				label = "event-log";
+				reg = <0xd0000 0x90000>;
+			};
+
+			partition@400000 {
+				label = "recovery";
+				reg = <0x200000 0xe00000>;
+			};
+		};
+	};
+
+	flash_nand@1 {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "spi-nand", "spinand,mt29f";
+		reg = <1>;
+		spi-max-frequency = <24000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "rutos-a";
+				reg = <0x00000000 0x08000000>;
+			};
+
+			partition@8000000 {
+				label = "rutos-b";
+				reg = <0x08000000 0x08000000>;
+			};
+		};
+	};
+};

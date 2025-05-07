@@ -234,6 +234,17 @@ define Build/zyxel-nwa-fit
 	@mv $@.new $@
 endef
 
+define Build/append-teltonika-metadata
+	echo \
+		'{ \
+			"device_code": [".*"], \
+			"hwver": [".*"], \
+			"batch": [".*"], \
+			"serial": [".*"], \
+			"supported_devices":["teltonika,rutm"] \
+		}' | fwtool -I - $@
+endef
+
 define Device/dsa-migration
   DEVICE_COMPAT_VERSION := 1.1
   DEVICE_COMPAT_MESSAGE := Config cannot be migrated from swconfig to DSA
@@ -2657,6 +2668,72 @@ define Device/tenbay_t-mb5eu-v01
   SUPPORTED_DEVICES += mt7621-dm2-t-mb5eu-v01-nor
 endef
 TARGET_DEVICES += tenbay_t-mb5eu-v01
+
+define Device/teltonika_rutm50
+  DEVICE_VENDOR := Teltonika
+  DEVICE_MODEL := RUTM50
+  DEVICE_PACKAGES := kmod-mt7615-firmware kmod-usb3 \
+	    kmod-sfp kmod-usb-ledtrig-usbport uboot-envtools
+endef
+TARGET_DEVICES += teltonika_rutm50
+
+define Device/teltonika_rutm11
+  $(Device/nand)
+  DEVICE_VENDOR := Teltonika
+  DEVICE_MODEL := RUTM11
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+  FILESYSTEMS := squashfs
+  IMAGE_SIZE := 147456k
+  DEVICE_PACKAGES := kmod-mt7615-firmware kmod-usb3 kmod-usb-serial-option \
+ 		kmod-usb-net-qmi-wwan kmod-usb-ledtrig-usbport uboot-envtools kmod-gpio-nxp-74hc164
+
+#~   DEVICE_PACKAGES := kmod-gpio-nxp-74hc164 kmod-mt7621-qtn-rgmii kmod-mt7615e\
+#~ 			   kmod-mt7615-common kmod-mt7615-firmware kmod-spi-gpio \
+#~ 			   kmod-crypto-hw-eip93 kmod-hwmon-tla2021
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size | append-teltonika-metadata
+  endef
+TARGET_DEVICES += teltonika_rutm11
+  
+define Device/teltonika_rutm51
+  $(Device/nand)
+  DEVICE_VENDOR := Teltonika
+  DEVICE_MODEL := RUTM51
+  BLOCKSIZE := 128k
+  PAGESIZE := 2048
+  KERNEL_IN_UBI := 1
+  FILESYSTEMS := squashfs
+  IMAGE_SIZE := 147456k
+  DEVICE_PACKAGES := kmod-mt7615-firmware kmod-usb3 kmod-usb-serial-option \
+ 		kmod-usb-net-cdc-ncm kmod-usb-ledtrig-usbport uboot-envtools kmod-gpio-nxp-74hc164
+  IMAGES += factory.bin
+  IMAGE/factory.bin := append-ubi | check-size | append-teltonika-metadata
+endef
+TARGET_DEVICES += teltonika_rutm51
+
+# define Device/teltonika_rutm11
+#   $(Device/dsa-migration)
+#   $(Device/nand)
+#   IMAGE_SIZE := 147456k
+#   BLOCKSIZE := 128k
+#   DEVICE_VENDOR := Teltonika
+#   DEVICE_MODEL := RUTM11
+#   DEVICE_PACKAGES := kmod-mt7615-firmware kmod-usb3 kmod-usb-serial-option \
+# 		kmod-usb-net-qmi-wwan kmod-sfp kmod-usb-ledtrig-usbport uboot-envtools
+#   IMAGES += factory.bin
+#   # IMAGE/factory.bin = \
+# 			append-kernel | pad-to $$$$(BLOCKSIZE) | \
+# 			append-rootfs | pad-rootfs | append-ubi | append-teltonika-metadata | \
+# 			check-size $$$$(IMAGE_SIZE)
+# # IMAGE/factory.bin :=append-ubi | check-size | append-teltonika-metadata
+# # IMAGE/factory.bin := append-kernel | append-rootfs | pad-rootfs | check-size | append-teltonika-metadata
+# #~   IMAGE/factory.bin := append-kernel | append-ubi | append-teltonika-metadata | check-size
+# #~   IMAGE/factory.ubi := append-ubi | append-teltonika-metadata
+# IMAGE/factory.bin := append-kernel | pad-to $$(KERNEL_SIZE) | append-ubi | append-teltonika-metadata
+# endef
+# TARGET_DEVICES += teltonika_rutm11
 
 define Device/thunder_timecloud
   $(Device/dsa-migration)
