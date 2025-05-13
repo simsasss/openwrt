@@ -23,6 +23,19 @@ boot() {
 		EOF
 		logger "bootcount: rd23 model detected, nvram was updated"
 		;;
+	teltonika,rutc50)
+		. /lib/functions.sh
+		local PART="$(cmdline_get_var ubi.mtd)"
+
+		case "$PART" in
+		rutos-a)
+			echo -ne "\xe1\xb0\xba\xba\x01\x00\xf9\x01\xf8\x01\xf0\x00\x3d\xd4\xfb\x95" | mtd -e bootconfig-a write - bootconfig-a
+			;;
+		rutos-b)
+			echo -ne "\xe1\xb0\xba\xba\x01\x01\xf8\x00\xf9\x01\xf0\x00\xf9\x42\x0c\x7d" | mtd -e bootconfig-b write - bootconfig-b
+			;;
+		esac
+		;;
 	zyxel,ex5700-telenor)
 		fw_setenv uboot_bootcount 0
 		;;
