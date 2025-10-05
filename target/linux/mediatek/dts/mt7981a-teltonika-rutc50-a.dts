@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+/dts-v1/;
+
+#include "mt7981a-teltonika-rutc-emmc-common.dtsi"
+
+/ {
+	model = "Teltonika RUTC50 A (eMMC)";
+	compatible = "teltonika,rutc50-a", "mediatek,mt7981";
+
+	memory@40000000 {
+		reg = <0 0x40000000 0 0x40000000>;
+		device_type = "memory";
+	};
+};
+
+&gpio_export {
+	gpio_modem_power {
+		gpio-export,name = "modem_power";
+		gpio-export,output = <0>;
+		gpios = <&gpio_hc595 17 GPIO_ACTIVE_HIGH>;
+	};
+
+	gpio_modem_reset {
+		gpio-export,name = "modem_reset";
+		gpio-export,output = <0>;
+		gpios = <&gpio_hc595 16 GPIO_ACTIVE_HIGH>;
+	};
+
+	gpio_esim_select {
+		gpio-export,name = "esim_select";
+		gpio-export,output = <0>;
+		gpios = <&gpio_hc595 20 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&leds {
+	5G {
+		function = "5G";
+		color = <LED_COLOR_ID_GREEN>;
+		gpios = <&gpio_hc595 11 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+&led_4g {
+	gpios = <&gpio_hc595 12 GPIO_ACTIVE_HIGH>;
+};
+
+&wan_eth {
+	gpios = <&gpio_hc595 14 GPIO_ACTIVE_HIGH>;
+};
+
+&wan_sim1 {
+	gpios = <&gpio_hc595 18 GPIO_ACTIVE_HIGH>;
+};
+
+&wan_sim2 {
+	gpios = <&gpio_hc595 19 GPIO_ACTIVE_HIGH>;
+};
+
+&wan_wifi {
+	gpios = <&gpio_hc595 15 GPIO_ACTIVE_HIGH>;
+};

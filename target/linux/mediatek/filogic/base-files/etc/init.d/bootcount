@@ -23,27 +23,40 @@ boot() {
 		EOF
 		logger "bootcount: rd23 model detected, nvram was updated"
 		;;
-	teltonika,rutc50)
-		#Bootloader expect successfull startup value after update, we need to write success value to bootconfig partition
-		#otherwise bootloader will fallback to previous root partition
+	teltonika,rutc50|\
+	teltonika,rutc50-a)
+		# The bootloader falls back to the other slot unless the running
+		# one is marked as successfully booted in bootconfig
 		. /lib/functions.sh
-		local PART="$(cmdline_get_var ubi.mtd)"
-		local MTD_INDEX=$(find_mtd_index bootconfig-a)
+		local slot record index
 
-		case "$PART" in
-		rutos-a)
-			[ "$(md5sum /dev/mtd$MTD_INDEX | awk '{print $1}')" = "adc4a78e76efc6b4afdc41925e4017c6" ] || {
-				logger -t "bootcount" "saving new failsafe boot config in /dev/mtd$MTD_INDEX bootconfig-a partition rutos-a"
-				echo -ne "\xe1\xb0\xba\xba\x01\x00\xf9\x01\xf8\x01\xf0\x00\x3d\xd4\xfb\x95" | mtd -e bootconfig-a write - bootconfig-a
-			}
-			;;
-		rutos-b)
-			[ "$(md5sum /dev/mtd$MTD_INDEX | awk '{print $1}')" = "2904b3476604ef153d1925acdde062e8" ] || {
-				logger -t "bootcount" "saving new failsafe boot config in /dev/mtd$MTD_INDEX bootconfig-a partition rutos-b"
-				echo -ne "\xe1\xb0\xba\xba\x01\x01\xf7\x01\xf8\x00\xf0\x00\xce\xd4\x44\x08" | mtd -e bootconfig-a write - bootconfig-a
-				}
-			;;
+		slot="$(cmdline_get_var ubi.mtd)"
+		[ -z "$slot" ] && [ -e /proc/device-tree/chosen/rootdisk ] && {
+			if [ "$(hexdump -v -e '/1 "%02x"' /proc/device-tree/chosen/rootdisk)" = \
+			     "$(hexdump -v -e '/1 "%02x"' /proc/device-tree/chosen/rootdisk-rutos-b)" ]; then
+				slot=rutos-b
+			else
+				slot=rutos-a
+			fi
+		}
+
+		case "$slot" in
+		rutos-a) record='\xe1\xb0\xba\xba\x01\x00\xf9\x01\xf8\x01\xf0\x00\x3d\xd4\xfb\x95' ;;
+		rutos-b) record='\xe1\xb0\xba\xba\x01\x01\xf7\x01\xf8\x00\xf0\x00\xce\xd4\x44\x08' ;;
+		*) return 0 ;;
 		esac
+
+		index="$(find_mtd_index bootconfig-a)"
+		[ -n "$index" ] || return 0
+
+		# partition must hold only our 16 byte record followed by erased
+		# flash (0xff), anything else gets rewritten
+		echo -ne "$record" | cmp -s -n 16 - /dev/mtd$index && \
+		[ "$(tail -c +17 /dev/mtd$index | tr -d '\377' | wc -c)" -eq 0 ] || {
+			echo -ne "$record" | \
+				mtd -q -e bootconfig-a write - bootconfig-a && \
+				logger -t bootcount "$slot marked as booted successfully"
+		}
 		;;
 	zyxel,ex5700-telenor)
 		fw_setenv uboot_bootcount 0
