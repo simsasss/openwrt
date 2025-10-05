@@ -2670,11 +2670,9 @@ define Device/snr_snr-cpe-ax2
 endef
 TARGET_DEVICES += snr_snr-cpe-ax2
 
-define Device/teltonika_rutc50
+define Device/teltonika_rutc_common
   DEVICE_VENDOR := Teltonika
-  DEVICE_MODEL := RUTC50
   SUPPORTED_TELTONIKA_DEVICES := teltonika,rutc
-  DEVICE_DTS := mt7981a-teltonika-rutc50
   DEVICE_DTS_DIR := ../dts
   BLOCKSIZE := 128k
   PAGESIZE := 2048
@@ -2683,10 +2681,34 @@ define Device/teltonika_rutc50
   DEVICE_PACKAGES := kmod-mt7915e kmod-mt7981-firmware mt7981-wo-firmware kmod-usb3 kmod-usb-net-qmi-wwan \
   kmod-usb-serial-option kmod-gpio-nxp-74hc164 uqmi
   IMAGES += factory.bin
+endef
+
+define Device/teltonika_rutc50
+  $(call Device/teltonika_rutc_common)
+  SUPPORTED_TELTONIKA_HW_MODS :=
+  DEVICE_MODEL := RUTC50
+  DEVICE_DTS := mt7981a-teltonika-rutc50
   IMAGE/factory.bin := append-ubi | append-teltonika-metadata
   IMAGE/sysupgrade.bin := sysupgrade-tar | append-metadata
 endef
 TARGET_DEVICES += teltonika_rutc50
+
+define Device/teltonika_rutcxx-emmc
+  $(call Device/teltonika_rutc_common)
+  SUPPORTED_TELTONIKA_HW_MODS := emmc
+  DEVICE_MODEL := RUTC50
+  DEVICE_DTS := mt7981a-teltonika-rutcxx-emmc
+  DEVICE_VARIANT := EMMC
+  DEVICE_PACKAGES += block-mount kmod-spi-gpio e2fsprogs f2fsck mkf2fs kmod-usb-net-rndis kmod-usb-net-cdc-ncm
+  KERNEL := kernel-bin | gzip
+  KERNEL_INITRAMFS := kernel-bin | lzma | \
+	fit lzma $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb with-initrd | pad-to 64k
+  IMAGE/factory.bin := append-kernel | \
+	fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-with-rootfs external-static-with-rootfs |\
+	pad-rootfs | append-teltonika-metadata
+  IMAGE/sysupgrade.bin := append-kernel | fit gzip $$(KDIR)/image-$$(firstword $$(DEVICE_DTS)).dtb external-static-with-rootfs | pad-rootfs | append-metadata
+endef
+TARGET_DEVICES += teltonika_rutcxx-emmc
 
 define Device/tenbay_wr3000k
   DEVICE_VENDOR := Tenbay

@@ -223,6 +223,17 @@ platform_do_upgrade() {
 		CI_UBIPART="$(cmdline_get_var ubi.mtd)"
 		nand_do_upgrade "$1"
 		;;
+	teltonika,rutcxx-emmc)
+		if [ "$(hexdump -e '"%02x"' /proc/device-tree/chosen/rootdisk)" = "$(hexdump -e '"%02x"' /proc/device-tree/chosen/rootdisk-rutos-a)" ];
+			then
+				CI_PART=rutos-a
+			else
+				CI_PART=rutos-b
+		fi
+		bootdev="$(find_mmc_part $CI_PART)"
+		EMMC_KERN_DEV="$bootdev"
+		emmc_do_upgrade "$1"
+		;;
 	nradio,c8-668gl)
 		CI_DATAPART="rootfs_data"
 		CI_KERNPART="kernel_2nd"
@@ -301,6 +312,7 @@ platform_check_image() {
 	netcore,n60|\
 	qihoo,360t7|\
 	routerich,ax3000-ubootmod|\
+	teltonika,rutcxx-emmc|\
 	tplink,tl-xdr4288|\
 	tplink,tl-xdr6086|\
 	tplink,tl-xdr6088|\
@@ -363,6 +375,7 @@ platform_copy_config() {
 	huasifei,wh3000-pro|\
 	jdcloud,re-cp-03|\
 	nradio,c8-668gl|\
+	teltonika,rutcxx-emmc|\
 	smartrg,sdg-8612|\
 	smartrg,sdg-8614|\
 	smartrg,sdg-8622|\

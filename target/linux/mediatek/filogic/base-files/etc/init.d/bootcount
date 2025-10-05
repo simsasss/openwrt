@@ -23,12 +23,25 @@ boot() {
 		EOF
 		logger "bootcount: rd23 model detected, nvram was updated"
 		;;
+	teltonika,rutcxx-emmc|\
 	teltonika,rutc50)
 		#Bootloader expect successfull startup value after update, we need to write success value to bootconfig partition
 		#otherwise bootloader will fallback to previous root partition
+
+		#while true; do value=$(hexdump -e '8/1 "%02x"' -n 16 -s "$offset" /dev/mtd5); echo "value: $value"; offset=$(( offset + 16 )); [ "$offset" -ge 1024 ] && break; done
+
 		. /lib/functions.sh
 		local PART="$(cmdline_get_var ubi.mtd)"
 		local MTD_INDEX=$(find_mtd_index bootconfig-a)
+
+		[ -z "$PART" ] && {
+			if [ "$(hexdump -e '"%02x"' /proc/device-tree/chosen/rootdisk)" = "$(hexdump -e '"%02x"' /proc/device-tree/chosen/rootdisk-rutos-a)" ];
+			then
+				PART=rutos-a
+			else
+				PART=rutos-b
+			fi
+		}
 
 		case "$PART" in
 		rutos-a)
