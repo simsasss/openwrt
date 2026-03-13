@@ -1240,8 +1240,7 @@ define Device/teltonika_rutx10
 	IMAGE/factory.ubi := append-ubi | qsdk-ipq-factory-nand | append-teltonika-metadata
 	DEVICE_PACKAGES := kmod-btusb
 endef
-# Missing DSA Setup
-#TARGET_DEVICES += teltonika_rutx10
+TARGET_DEVICES += teltonika_rutx10
 
 define Device/teltonika_rutx50
 	$(call Device/FitImage)
