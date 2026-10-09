@@ -3163,6 +3163,7 @@ define Device/teltonika_rut955
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-acm kmod-usb-net-qmi-wwan \
 	kmod-usb-serial-option kmod-hwmon-mcp3021 uqmi -uboot-envtools
   IMAGE_SIZE := 15552k
+  SUPPORTED_TELTONIKA_DEVICES := teltonika,rut9xx
   TPLINK_HWID := 0x35000001
   TPLINK_HWREV := 0x1
   TPLINK_HEADER_VERSION := 1
@@ -3171,7 +3172,7 @@ define Device/teltonika_rut955
   IMAGES += factory.bin
   IMAGE/factory.bin := append-kernel | pad-to $$$$(BLOCKSIZE) | append-rootfs |\
 	pad-rootfs | teltonika-fw-fake-checksum 20 | append-string master |\
-	append-md5sum-bin | check-size
+	append-md5sum-bin | append-teltonika-metadata | check-size
   IMAGE/sysupgrade.bin := append-kernel | pad-to $$$$(BLOCKSIZE) |\
 	append-rootfs | pad-rootfs | check-size | append-metadata
 endef
