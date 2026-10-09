@@ -3119,6 +3119,7 @@ define Device/teltonika_rut230-v1
   DEVICE_PACKAGES := kmod-usb2 kmod-usb-chipidea2 kmod-usb-acm \
 	kmod-usb-net-qmi-wwan kmod-usb-serial-option uqmi -uboot-envtools
   IMAGE_SIZE := 15552k
+  SUPPORTED_TELTONIKA_DEVICES := teltonika,rut2xx
   TPLINK_HWID := 0x32200002
   TPLINK_HWREV := 0x1
   TPLINK_HEADER_VERSION := 1
@@ -3126,7 +3127,8 @@ define Device/teltonika_rut230-v1
   KERNEL_INITRAMFS := kernel-bin | append-dtb | lzma | uImage lzma
   IMAGES += factory.bin
   IMAGE/factory.bin := append-kernel | pad-to $$$$(BLOCKSIZE) | append-rootfs |\
-	pad-rootfs | pad-extra 64 | teltonika-fw-fake-checksum 54 | check-size
+	pad-rootfs | pad-extra 64 | teltonika-fw-fake-checksum 54 |\
+	append-teltonika-metadata | check-size
   IMAGE/sysupgrade.bin := append-kernel | pad-to $$$$(BLOCKSIZE) |\
 	append-rootfs | pad-rootfs | append-metadata |\
 	check-size
