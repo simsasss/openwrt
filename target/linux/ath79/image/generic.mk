@@ -3150,6 +3150,12 @@ define Device/teltonika_rut300
 endef
 TARGET_DEVICES += teltonika_rut300
 
+define Device/teltonika_rut950
+  $(Device/teltonika_rut955)
+  DEVICE_MODEL := RUT950
+endef
+TARGET_DEVICES += teltonika_rut950
+
 define Device/teltonika_rut955
   SOC := ar9344
   DEVICE_VENDOR := Teltonika

@@ -53,6 +53,12 @@ teltonika,rut230-v1)
 	ucidef_add_gpio_switch "modem_pwr" "Modem power" "531" "1"
 	ucidef_add_gpio_switch "modem_rst" "Modem reset" "530" "0"
 	;;
+teltonika,rut950)
+	ucidef_add_gpio_switch "sim_sel" "SIM select" "542" "1"
+	ucidef_add_gpio_switch "modem_vbus" "Modem enable" "545" "1"
+	ucidef_add_gpio_switch "modem_rst" "Modem reset" "546" "0"
+	ucidef_add_gpio_switch "DOUT1" "DOUT1 (OC)" "547" "0"
+	;;
 teltonika,rut955)
 	ucidef_add_gpio_switch "sim_sel" "SIM select" "542" "1"
 	ucidef_add_gpio_switch "DOUT1" "DOUT1 (OC)" "543" "0"
