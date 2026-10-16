@@ -3150,6 +3150,24 @@ define Device/teltonika_rut300
 endef
 TARGET_DEVICES += teltonika_rut300
 
+define Device/teltonika_rut360
+  SOC := qca9531
+  DEVICE_VENDOR := Teltonika
+  DEVICE_MODEL := RUT360
+  SUPPORTED_TELTONIKA_DEVICES := teltonika,rut36x
+  DEVICE_PACKAGES := -uboot-envtools kmod-usb2 kmod-usb-net-qmi-wwan \
+	kmod-usb-serial-option uqmi
+  IMAGE_SIZE := 15552k
+  IMAGES += factory.bin
+  IMAGE/factory.bin = append-kernel | pad-to $$$$(BLOCKSIZE) | \
+			 append-rootfs | pad-rootfs | append-teltonika-metadata | \
+			 check-size $$$$(IMAGE_SIZE)
+  IMAGE/sysupgrade.bin = append-kernel | pad-to $$$$(BLOCKSIZE) | \
+			 append-rootfs | pad-rootfs | append-metadata | \
+			 check-size $$$$(IMAGE_SIZE)
+endef
+TARGET_DEVICES += teltonika_rut360
+
 define Device/teltonika_rut955
   SOC := ar9344
   DEVICE_VENDOR := Teltonika

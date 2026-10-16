@@ -1,0 +1,256 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include "qca953x.dtsi"
+
+/ {
+	compatible = "teltonika,rut360", "teltonika,rut36x", "qca,qca9531";
+	model = "Teltonika RUT360";
+
+	aliases {
+		label-mac-device = &eth1;
+		led-boot = &led_power;
+		led-failsafe = &led_rssi0;
+		led-running = &led_power;
+		led-upgrade = &led_rssi0;
+		serial0 = &uart;
+	};
+
+	ext_io {
+		compatible = "spi-gpio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		gpio-sck = <&gpio 0 GPIO_ACTIVE_HIGH>;  // SRCLK
+		gpio-mosi = <&gpio 2 GPIO_ACTIVE_HIGH>; // SER
+		cs-gpios = <&gpio 1 GPIO_ACTIVE_HIGH>;  // RCLK
+		num-chipselects = <1>;
+
+		shift_io: shift_io@0 {
+			compatible = "fairchild,74hc595";
+			reg = <0>;
+			gpio-controller;
+			#gpio-cells = <2>;
+			registers-number = <2>;
+			spi-max-frequency = <10000000>;
+		};
+	};
+
+	gpio-export {
+		compatible = "gpio-export";
+
+		gpio_modem_reset {
+			gpio-export,name = "modem_reset";
+			gpio-export,output = <0>;
+			gpios = <&gpio 15 GPIO_ACTIVE_HIGH>;
+		};
+
+		gpio_modem_power {
+			gpio-export,name = "modem_power";
+			gpio-export,output = <0>;
+			gpios = <&gpio 16 GPIO_ACTIVE_HIGH>;
+		};
+
+		gpio_in_1 {
+			gpio-export,name = "gpio_in_1";
+			gpio-export,input = <0>;
+			gpios = <&gpio 11 GPIO_ACTIVE_LOW>;
+		};
+
+		gpio_in_2 {
+			gpio-export,name = "gpio_in_2";
+			gpio-export,input = <0>;
+			gpios = <&gpio 12 GPIO_ACTIVE_LOW>;
+		};
+
+		gpio_out_1 {
+			gpio-export,name = "gpio_out_1";
+			gpio-export,output = <0>;
+			gpios = <&shift_io 7 GPIO_ACTIVE_HIGH>;
+		};
+
+		gpio_out_2 {
+			gpio-export,name = "gpio_out_2";
+			gpio-export,output = <0>;
+			gpios = <&shift_io 6 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led-0 {
+			label = "green:eth1";
+			gpios = <&gpio 4 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-1 {
+			label = "green:eth2";
+			gpios = <&gpio 13 GPIO_ACTIVE_HIGH>;
+		};
+
+		led_power: led-2 {
+			label = "green:power";
+			gpios = <&shift_io 0 GPIO_ACTIVE_LOW>;
+			default-state = "on";
+			retain-state-suspended;
+		};
+
+		led-3 {
+			label = "green:3g";
+			gpios = <&shift_io 1 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-4 {
+			label = "green:4g";
+			gpios = <&shift_io 2 GPIO_ACTIVE_HIGH>;
+		};
+
+		led_rssi0: led-5 {
+			label = "green:rssi0";
+			gpios = <&shift_io 3 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-6 {
+			label = "green:rssi1";
+			gpios = <&shift_io 4 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-7 {
+			label = "green:rssi2";
+			gpios = <&shift_io 5 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	keys {
+		compatible = "gpio-keys";
+
+		reset {
+			label = "reset";
+			linux,code = <KEY_RESTART>;
+			gpios = <&gpio 17 GPIO_ACTIVE_LOW>;
+		};
+	};
+};
+
+&spi {
+	status = "okay";
+
+	num-cs = <2>;
+	cs-gpios = <0>, <&gpio 14 GPIO_ACTIVE_HIGH>;
+
+	flash@0 {
+		compatible = "jedec,spi-nor";
+		reg = <0>;
+		spi-max-frequency = <25000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "u-boot";
+				reg = <0x000000 0x020000>;
+				read-only;
+			};
+
+			config: partition@20000 {
+				label = "config";
+				reg = <0x020000 0x010000>;
+				read-only;
+
+				nvmem-layout {
+					compatible = "fixed-layout";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					macaddr_config_0: macaddr@0 {
+						compatible = "mac-base";
+						reg = <0x0 0x6>;
+						#nvmem-cell-cells = <1>;
+					};
+				};
+			};
+
+			partition@30000 {
+				label = "art";
+				reg = <0x030000 0x010000>;
+				read-only;
+
+				nvmem-layout {
+					compatible = "fixed-layout";
+					#address-cells = <1>;
+					#size-cells = <1>;
+
+					cal_art_1000: calibration@1000 {
+						reg = <0x1000 0x440>;
+					};
+				};
+			};
+
+			partition@40000 {
+				compatible = "denx,uimage";
+				label = "firmware";
+				reg = <0x040000 0xf30000>;
+			};
+
+			partition@f70000 {
+				label = "event-log";
+				reg = <0xf70000 0x090000>;
+			};
+		};
+	};
+
+	flash@1 {
+		compatible = "spi-nand";
+		reg = <1>;
+		spi-max-frequency = <25000000>;
+
+		partitions {
+			compatible = "fixed-partitions";
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "nand_ubi";
+				reg = <0x0 0x10000000>;
+			};
+		};
+	};
+};
+
+&usb0 {
+	status = "okay";
+};
+
+&usb_phy {
+	status = "okay";
+};
+
+&uart {
+	status = "okay";
+};
+
+&eth0 {
+	status = "okay";
+
+	phy-handle = <&swphy4>;
+
+	nvmem-cells = <&macaddr_config_0 1>;
+	nvmem-cell-names = "mac-address";
+};
+
+&eth1 {
+	nvmem-cells = <&macaddr_config_0 0>;
+	nvmem-cell-names = "mac-address";
+};
+
+&wmac {
+	status = "okay";
+
+	nvmem-cells = <&macaddr_config_0 2>, <&cal_art_1000>;
+	nvmem-cell-names = "mac-address", "calibration";
+};
