@@ -4,6 +4,7 @@ DEVICE_VARS += RAS_BOARD RAS_ROOTFS_SIZE RAS_VERSION
 DEVICE_VARS += WRGG_DEVNAME WRGG_SIGNATURE
 DEVICE_VARS += SUPPORTED_TELTONIKA_DEVICES
 DEVICE_VARS += SUPPORTED_TELTONIKA_HW_MODS
+DEVICE_VARS += SUPPORTED_TELTONIKA_HW_SUPPORT
 
 define Build/netgear-fit-padding
 	./netgear-fit-padding.py $@ $@.new
@@ -1267,40 +1268,96 @@ define Device/sophos_apx120
 endef
 TARGET_DEVICES += sophos_apx120
 
-define Device/teltonika_rutx10
+define Device/teltonika_rutx
 	$(call Device/FitImage)
 	$(call Device/UbiFit)
 	DEVICE_VENDOR := Teltonika
-	DEVICE_MODEL := RUTX10
-	SUPPORTED_TELTONIKA_DEVICES := teltonika,rutx
-	SUPPORTED_TELTONIKA_HW_MODS := W25N02KV NAND_GD5F2GXX EG060K RUTX_V12
 	SOC := qcom-ipq4018
 	DEVICE_DTS_CONFIG := config@5
 	KERNEL_INSTALL := 1
 	BLOCKSIZE := 128k
 	PAGESIZE := 2048
 	FILESYSTEMS := squashfs
-	IMAGE/factory.ubi := append-ubi | qsdk-ipq-factory-nand | append-teltonika-metadata
-	DEVICE_PACKAGES := kmod-btusb
+	# RUTOS WebUI upgrade validation (see lib/upgrade/platform.sh in the
+	# vendor SDK): board name, I/O expander type and HW mods supported by
+	# the image
+	SUPPORTED_TELTONIKA_DEVICES := teltonika,rutx
+	SUPPORTED_TELTONIKA_HW_SUPPORT := io_expander=shiftreg_1
+	SUPPORTED_TELTONIKA_HW_MODS := blv1 W25N02KV NAND_GD5F2GXX EG060K RUTX_V12
+	IMAGE/factory.ubi := append-ubi | qsdk-ipq-factory-nand | \
+		append-teltonika-metadata
+	DEVICE_PACKAGES := kmod-gpio-nxp-74hc164 kmod-spi-gpio
 endef
-# Missing DSA Setup
-#TARGET_DEVICES += teltonika_rutx10
+
+define Device/teltonika_rutx08
+	$(Device/teltonika_rutx)
+	DEVICE_MODEL := RUTX08
+	DEVICE_PACKAGES += -ath10k-firmware-qca4019-ct -kmod-ath10k-ct \
+		-wpad-basic-mbedtls -ath10k-board-qca4019
+endef
+TARGET_DEVICES += teltonika_rutx08
+
+define Device/teltonika_rutx09
+	$(Device/teltonika_rutx)
+	DEVICE_MODEL := RUTX09
+	DEVICE_PACKAGES += -ath10k-firmware-qca4019-ct -kmod-ath10k-ct \
+		-wpad-basic-mbedtls -ath10k-board-qca4019 \
+		kmod-usb-net-qmi-wwan kmod-usb-serial-option uqmi
+endef
+TARGET_DEVICES += teltonika_rutx09
+
+define Device/teltonika_rutx10
+	$(Device/teltonika_rutx)
+	DEVICE_MODEL := RUTX10
+	DEVICE_PACKAGES += kmod-btusb
+endef
+TARGET_DEVICES += teltonika_rutx10
+
+define Device/teltonika_rutx11
+	$(Device/teltonika_rutx)
+	DEVICE_MODEL := RUTX11
+	DEVICE_PACKAGES += kmod-btusb kmod-usb-net-qmi-wwan \
+		kmod-usb-serial-option uqmi
+endef
+TARGET_DEVICES += teltonika_rutx11
+
+define Device/teltonika_rutx12
+	$(Device/teltonika_rutx)
+	DEVICE_MODEL := RUTX12
+	DEVICE_PACKAGES += kmod-btusb kmod-usb-net-qmi-wwan \
+		kmod-usb-serial-option uqmi
+endef
+TARGET_DEVICES += teltonika_rutx12
+
+define Device/teltonika_rutx14
+	$(Device/teltonika_rutx)
+	DEVICE_MODEL := RUTX14
+	SUPPORTED_TELTONIKA_HW_MODS += RUTX14_V4
+	DEVICE_PACKAGES += kmod-btusb kmod-usb-net-qmi-wwan \
+		kmod-usb-serial-option uqmi
+endef
+TARGET_DEVICES += teltonika_rutx14
+
+define Device/teltonika_rutxr1
+	$(Device/teltonika_rutx)
+	DEVICE_MODEL := RUTXR1
+	DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-serial-option uqmi
+endef
+TARGET_DEVICES += teltonika_rutxr1
 
 define Device/teltonika_rutx50
-	$(call Device/FitImage)
-	$(call Device/UbiFit)
-	DEVICE_VENDOR := Teltonika
+	$(Device/teltonika_rutx)
 	DEVICE_MODEL := RUTX50
-	SOC := qcom-ipq4018
-	DEVICE_DTS_CONFIG := config@5
-	KERNEL_INSTALL := 1
-	BLOCKSIZE := 128k
-	PAGESIZE := 2048
-	FILESYSTEMS := squashfs
-	IMAGE/factory.ubi := append-ubi
-	DEVICE_PACKAGES := kmod-gpio-nxp-74hc164 kmod-spi-gpio kmod-usb-net-qmi-wwan kmod-usb-serial-option uqmi
+	DEVICE_VARIANT := HW rev. <4
+	DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-serial-option uqmi
 endef
 TARGET_DEVICES += teltonika_rutx50
+
+define Device/teltonika_rutx50-v4
+	$(Device/teltonika_rutx50)
+	DEVICE_VARIANT := HW rev. 4+
+endef
+TARGET_DEVICES += teltonika_rutx50-v4
 
 define Device/tel_x1pro
 	$(call Device/FitImage)

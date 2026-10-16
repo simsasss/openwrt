@@ -244,8 +244,15 @@ platform_do_upgrade() {
 		fwtool -q -t -i /dev/null "$1" || true
 		nand_do_upgrade "$1"
 		;;
+	teltonika,rutx08|\
+	teltonika,rutx09|\
 	teltonika,rutx10|\
+	teltonika,rutx11|\
+	teltonika,rutx12|\
+	teltonika,rutx14|\
+	teltonika,rutxr1|\
 	teltonika,rutx50|\
+	teltonika,rutx50-v4|\
 	zte,mf18a|\
 	zte,mf282plus|\
 	zte,mf286d|\

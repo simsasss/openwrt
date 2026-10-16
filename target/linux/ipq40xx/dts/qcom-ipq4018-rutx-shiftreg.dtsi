@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "qcom-ipq4018-rutx.dtsi"
+
+/ {
+	aliases {
+		ethernet0 = &gmac;
+		label-mac-device = &gmac;
+	};
+
+	soc {
+		spi-gpio {
+			compatible = "spi-gpio";
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			gpio-sck = <&tlmm 1 GPIO_ACTIVE_HIGH>;  // SRCLK
+			gpio-mosi = <&tlmm 3 GPIO_ACTIVE_HIGH>; // SER
+			cs-gpios = <&tlmm 2 GPIO_ACTIVE_LOW>;   // RCLK
+			num-chipselects = <1>;
+
+			shift_io: shift_io@0 {
+				compatible = "fairchild,74hc595";
+				reg = <0>;
+				gpio-controller;
+				#gpio-cells = <2>;
+				registers-number = <3>;
+				spi-max-frequency = <10000000>;
+			};
+		};
+
+		gpio-export {
+			compatible = "gpio-export";
+
+			gpio_in {
+				gpio-export,name = "gpio_in";
+				gpio-export,input = <0>;
+				gpios = <&tlmm 0 GPIO_ACTIVE_LOW>;
+			};
+		};
+	};
+};
+
+&gmac {
+	status = "okay";
+};
+
+&switch {
+	status = "okay";
+};
+
+&swport2 {
+	status = "okay";
+
+	label = "lan1";
+};
+
+&swport3 {
+	status = "okay";
+
+	label = "lan2";
+};
+
+&swport4 {
+	status = "okay";
+
+	label = "lan3";
+};
+
+&swport5 {
+	status = "okay";
+
+	label = "wan";
+};

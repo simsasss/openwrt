@@ -155,7 +155,7 @@ define Build/append-teltonika-metadata
 			"target": "$(call json_quote,$(TARGETID))", \
 			"board": "$(call json_quote,$(if $(BOARD_NAME),$(BOARD_NAME),$(DEVICE_NAME)))" \
 		}, \
-			"hw_support": {}, \
+			"hw_support": {$(shell i=1; for hs in $(SUPPORTED_TELTONIKA_HW_SUPPORT); do [ $$i -gt 1 ] && echo -n ,; echo -n "\"$${hs%%=*}\": [\"$$(echo $${hs#*=} | sed 's/,/\", \"/g')\"]"; i=$$((i+1)); done)}, \
 			"hw_mods": {$(shell i=1; for mod in $(SUPPORTED_TELTONIKA_HW_MODS); do [ $$i -gt 1 ] && echo -n ,; echo -n "\"mod$$i\": \"$$mod\""; i=$$((i+1)); done)} \
 		}' | fwtool -I - $@
 endef

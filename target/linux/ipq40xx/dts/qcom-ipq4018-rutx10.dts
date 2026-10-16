@@ -1,63 +1,42 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 
-#include "qcom-ipq4018-rutx.dtsi"
+#include "qcom-ipq4018-rutx-shiftreg.dtsi"
 
 / {
 	model = "Teltonika RUTX10";
 	compatible = "teltonika,rutx10";
 
 	soc {
-		leds {
-			compatible = "gpio-leds";
-
-			wifi2g {
-				label = "green:wifi2g";
-				gpios = <&stm32_io 19 GPIO_ACTIVE_HIGH>;
-				linux,default-trigger = "phy0tpt";
-			};
-
-			wifi5g {
-				label = "green:wifi5g";
-				gpios = <&stm32_io 18 GPIO_ACTIVE_HIGH>;
-				linux,default-trigger = "phy1tpt";
-			};
-		};
-
-		gpio_export {
-			compatible = "gpio-export";
-
+		gpio-export {
 			gpio_out {
 				gpio-export,name = "gpio_out";
 				gpio-export,output = <0>;
-				gpio-export,direction_may_change = <0>;
-				gpios = <&stm32_io 23 GPIO_ACTIVE_HIGH>;
+				gpios = <&shift_io 0 GPIO_ACTIVE_HIGH>;
 			};
 
-			gpio_in {
-				gpio-export,name = "gpio_in";
-				gpio-export,input = <0>;
-				gpio-export,direction_may_change = <0>;
-				gpios = <&stm32_io 24 GPIO_ACTIVE_LOW>;
+			gpio_bt_reset {
+				gpio-export,name = "bt_reset";
+				gpio-export,output = <0>;
+				gpio-export,toggle = <100>; // ms
+				gpios = <&shift_io 4 GPIO_ACTIVE_HIGH>;
 			};
 		};
-	};
-};
 
-&blsp1_i2c3 {
-	status = "okay";
-	pinctrl-0 = <&i2c_0_pins>;
-	pinctrl-names = "default";
-	clock-frequency = <400000>;
+		leds {
+			compatible = "gpio-leds";
 
-	stm32_io: stm32@74 {
-		compatible = "tlt,stm32v1";
-		#gpio-cells = <2>;
-		#interrupt-cells = <2>;
-		gpio-controller;
-		interrupt-controller;
-		interrupt-parent = <&tlmm>;
-		interrupts = <5 2>;
-		reg = <0x74>;
+			led-0 {
+				label = "green:wifi2g";
+				gpios = <&shift_io 5 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "phy0tpt";
+			};
+
+			led-1 {
+				label = "green:wifi5g";
+				gpios = <&shift_io 6 GPIO_ACTIVE_HIGH>;
+				linux,default-trigger = "phy1tpt";
+			};
+		};
 	};
 };
 
