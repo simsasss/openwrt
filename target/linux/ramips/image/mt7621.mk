@@ -2963,6 +2963,81 @@ define Device/teltonika_rutm11
 endef
 TARGET_DEVICES += teltonika_rutm11
 
+define Device/teltonika_rutm08
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM08
+endef
+TARGET_DEVICES += teltonika_rutm08
+
+define Device/teltonika_rutm09
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM09
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-mbim
+endef
+TARGET_DEVICES += teltonika_rutm09
+
+define Device/teltonika_rutm10
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM10
+endef
+TARGET_DEVICES += teltonika_rutm10
+
+define Device/teltonika_rutm12
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM12
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-mbim
+endef
+TARGET_DEVICES += teltonika_rutm12
+
+define Device/teltonika_rutm16
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM16
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-mbim
+endef
+TARGET_DEVICES += teltonika_rutm16
+
+define Device/teltonika_rutm20
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM20
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-ncm kmod-iio-ads1015
+endef
+TARGET_DEVICES += teltonika_rutm20
+
+define Device/teltonika_rutm52
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM52
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-ncm kmod-sdhci-mt7620
+endef
+TARGET_DEVICES += teltonika_rutm52
+
+define Device/teltonika_rutm54
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM54
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-ncm
+endef
+TARGET_DEVICES += teltonika_rutm54
+
+define Device/teltonika_rutm55
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM55
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-ncm kmod-iio-ads1015
+endef
+TARGET_DEVICES += teltonika_rutm55
+
+define Device/teltonika_rutm56
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM56
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-ncm
+endef
+TARGET_DEVICES += teltonika_rutm56
+
+define Device/teltonika_rutm59
+  $(Device/teltonika_rutm_common)
+  DEVICE_MODEL := RUTM59
+  DEVICE_PACKAGES += kmod-usb-net-qmi-wwan kmod-usb-net-cdc-ncm
+endef
+TARGET_DEVICES += teltonika_rutm59
+
 define Device/thunder_timecloud
   $(Device/dsa-migration)
   $(Device/uimage-lzma-loader)

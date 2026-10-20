@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+&pcie {
+	status = "okay";
+};
+
+&pcie0 {
+	wifi@0,0 {
+		compatible = "mediatek,mt76";
+		reg = <0x0000 0 0 0 0>;
+		nvmem-cells = <&eeprom_factory_0>;
+		nvmem-cell-names = "eeprom";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		band@0 {
+			reg = <0>;
+			nvmem-cells = <&macaddr_config_0 2>;
+			nvmem-cell-names = "mac-address";
+		};
+
+		band@1 {
+			reg = <1>;
+			nvmem-cells = <&macaddr_config_0 3>;
+			nvmem-cell-names = "mac-address";
+		};
+	};
+};

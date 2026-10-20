@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "mt7621_teltonika_rutm-3lan.dtsi"
+#include "mt7621_teltonika_rutm-wifi.dtsi"
+
+/ {
+	compatible = "teltonika,rutm10", "mediatek,mt7621-soc";
+	model = "Teltonika RUTM10";
+
+	leds {
+		wifi_2g {
+			function = LED_FUNCTION_WLAN_2GHZ;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 6 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "phy0tpt";
+		};
+
+		wifi_5g {
+			function = LED_FUNCTION_WLAN_5GHZ;
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 7 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "phy1tpt";
+		};
+	};
+};

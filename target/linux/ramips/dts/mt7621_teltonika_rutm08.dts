@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "mt7621_teltonika_rutm-3lan.dtsi"
+
+/ {
+	compatible = "teltonika,rutm08", "mediatek,mt7621-soc";
+	model = "Teltonika RUTM08";
+};
+
+/* only the LAN/WAN port LEDs are wired, one register is enough */
+&gpio_hc595 {
+	registers-number = <1>;
+};

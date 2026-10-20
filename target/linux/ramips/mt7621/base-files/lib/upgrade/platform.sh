@@ -232,9 +232,20 @@ platform_do_upgrade() {
 		zyxel_mstc_upgrade_prepare
 		nand_do_upgrade "$1"
 		;;
+	teltonika,rutm08|\
+	teltonika,rutm09|\
+	teltonika,rutm10|\
 	teltonika,rutm11|\
+	teltonika,rutm12|\
+	teltonika,rutm16|\
+	teltonika,rutm20|\
 	teltonika,rutm30|\
-	teltonika,rutm50)
+	teltonika,rutm50|\
+	teltonika,rutm52|\
+	teltonika,rutm54|\
+	teltonika,rutm55|\
+	teltonika,rutm56|\
+	teltonika,rutm59)
 		CI_UBIPART="$(cmdline_get_var ubi.mtd)"
 		nand_do_upgrade "$1"
 		;;

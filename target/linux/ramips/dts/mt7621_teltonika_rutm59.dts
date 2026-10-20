@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+
+#include "mt7621_teltonika_rutm-4lan-5g.dtsi"
+
+/ {
+	compatible = "teltonika,rutm59", "mediatek,mt7621-soc";
+	model = "Teltonika RUTM59";
+
+	gpio-export {
+		compatible = "gpio-export";
+		#size-cells = <0>;
+
+		gpio_modem_reset {
+			gpio-export,name = "modem_reset";
+			gpio-export,output = <0>;
+			gpios = <&gpio 14 GPIO_ACTIVE_HIGH>;
+		};
+
+		gpio_modem_power {
+			gpio-export,name = "modem_power";
+			gpio-export,output = <0>;
+			gpios = <&gpio 17 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	leds {
+		wan_sim1 {
+			function = "wan-sim1";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 41 GPIO_ACTIVE_HIGH>;
+		};
+
+		wan_sim2 {
+			function = "wan-sim2";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 43 GPIO_ACTIVE_HIGH>;
+		};
+
+		wan_eth {
+			function = "wan-eth";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio 42 GPIO_ACTIVE_HIGH>;
+		};
+	};
+};
